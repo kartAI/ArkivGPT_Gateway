@@ -15,9 +15,9 @@ public class SummaryController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult Get([FromQuery] string GNR, [FromQuery] string BNR, [FromQuery] string SNR)
+    public ActionResult<Summary> Get([FromQuery] int GNR, [FromQuery] int BNR, [FromQuery] int SNR)
     {
-        return Ok(new { GNR, BNR, SNR });
+        return Ok(new Summary(GNR, BNR, SNR));
     }
     
 }
