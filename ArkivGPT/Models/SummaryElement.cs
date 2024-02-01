@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ArkivGPT;
 
-public class SummaryElement
+public record class SummaryElement
 {
     public SummaryElement(){}
     
