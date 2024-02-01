@@ -15,9 +15,29 @@ public class SummaryController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<Summary> Get([FromQuery] int GNR, [FromQuery] int BNR, [FromQuery] int SNR)
+    public ActionResult<CaseData> Get([FromQuery] int gnr, [FromQuery] int bnr, [FromQuery] int snr)
     {
-        return Ok(new Summary(GNR, BNR, SNR));
+        var summary = new List<SummaryElement>()
+        {
+            new SummaryElement(new DateOnly(2020, 5, 2), "Test resolution 1", "http://test1"),
+            new SummaryElement(new DateOnly(2021, 6, 1), "Test resolution 2", "http://test2")
+        };
+
+        var propertyInfo = new PropertyInfo()
+        {
+            Gnr = gnr,
+            Bnr = bnr,
+            Snr = snr,
+            Address = "Test address"
+        };
+
+
+
+        var caseData = new CaseData(summary, propertyInfo);
+        
+
+
+        return Ok(caseData);
     }
     
 }
