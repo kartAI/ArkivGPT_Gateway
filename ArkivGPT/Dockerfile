@@ -1,20 +1,19 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+﻿# Use the Microsoft .NET SDK image to build the project
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+WORKDIR /gateway
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-COPY ["ArkivGPT/ArkivGPT.csproj", "ArkivGPT/"]
-RUN dotnet restore "ArkivGPT/ArkivGPT.csproj"
-COPY . .
-WORKDIR "/src/ArkivGPT"
-RUN dotnet build "ArkivGPT.csproj" -c Release -o /app/build
+# Copy csproj and restore any dependencies (via NuGet)
+COPY *.csproj ./
+RUN dotnet restore
 
-FROM build AS publish
-RUN dotnet publish "ArkivGPT.csproj" -c Release -o /app/publish /p:UseAppHost=false
+# Copy the project files and build our release
+COPY . ./
+RUN dotnet publish -c Debug -o out
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# Generate runtime image
+FROM mcr.microsoft.com/dotnet/runtime:8.0
+WORKDIR /gateway
+COPY --from=build-env /gateway/out .
+
+# Run the gRPC client
 ENTRYPOINT ["dotnet", "ArkivGPT.dll"]
