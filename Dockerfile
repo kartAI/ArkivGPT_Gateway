@@ -3,8 +3,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /gateway
 
 # Copy csproj and restore any dependencies (via NuGet)
-COPY ["ArkivGPT/ArkivGPT.csproj", "ArkivGPT/"]
-RUN dotnet restore "ArkivGPT/ArkivGPT.csproj"
+COPY ["ArkivGPT/ArkivGPT_Gateway.csproj", "ArkivGPT_Gateway/"]
+RUN dotnet restore "ArkivGPT_Gateway/ArkivGPT_Gateway.csproj"
 
 # Copy the project files and build our release
 COPY . .
@@ -16,4 +16,4 @@ WORKDIR /gateway
 COPY --from=build-env /gateway/out .
 
 # Run the gRPC client
-ENTRYPOINT ["dotnet", "ArkivGPT.dll"]
+ENTRYPOINT ["dotnet", "ArkivGPT_Gateway.dll"]

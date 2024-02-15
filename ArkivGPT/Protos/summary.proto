@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "ArkivGPT";
+option csharp_namespace = "ArkivGPT_Gateway";
 
 package summary;
 

@@ -1,8 +1,9 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
+using ArkivGPT_Gateway;
 using Grpc.Net.Client;
+using Microsoft.AspNetCore.Mvc;
 
-namespace ArkivGPT.Controllers;
+namespace ArkivGPT_Gateway.Controllers;
 
 [ApiController]
 [Route("/api/[controller]")]
@@ -27,7 +28,7 @@ public class SummaryController : ControllerBase
         Console.WriteLine("Greeting: " + reply.Resolution);
         
         var response = Response;
-        response.Headers.Add("Content-Type", "text/event-stream");
+        response.Headers.Append("Content-Type", "text/event-stream");
         
         await response.WriteAsync($"data: {JsonSerializer.Serialize(reply)}\n\n");
         await response.Body.FlushAsync();

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArkivGPT", "ArkivGPT\ArkivGPT.csproj", "{4D18B799-2223-4E19-A8A4-38EF79AF4369}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArkivGPT_Gateway", "ArkivGPT\ArkivGPT_Gateway.csproj", "{4D18B799-2223-4E19-A8A4-38EF79AF4369}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
