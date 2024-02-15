@@ -19,18 +19,19 @@ public class SummaryController : ControllerBase
     [HttpGet]
     public async Task Get([FromQuery] int gnr, [FromQuery] int bnr, [FromQuery] int snr)
     {
-        Console.Write("Accessed");
-        var element = new SummaryElement(new DateOnly(2020, 5, 2), "Test resolution 1", "http://test1");
+        // Use this to send the data were it is supposed to go
+        var serverAddress = Environment.GetEnvironmentVariable("GRPC_SERVER_ADDRESS") ?? "http://localhost:5001"; // To handel docker and local
+        using var channel = GrpcChannel.ForAddress(serverAddress);
+        var client = new Summary.SummaryClient(channel);
+        var reply = await client.SaySummaryAsync(new SummaryRequest { Gnr = "1" });
+        Console.WriteLine("Greeting: " + reply.Resolution);
         
         var response = Response;
         response.Headers.Add("Content-Type", "text/event-stream");
+        
+        await response.WriteAsync($"data: {JsonSerializer.Serialize(reply)}\n\n");
+        await response.Body.FlushAsync();
 
-        for (var i = 0; i < 10; i++)
-        {
-            await response.WriteAsync($"data: {JsonSerializer.Serialize(element)}\n\n");
-            await response.Body.FlushAsync();
-            await Task.Delay(1000);
-        }
     }
     
 }
