@@ -20,10 +20,9 @@ public class SummaryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task Get([FromQuery] int gnr, [FromQuery] int bnr, [FromQuery] int snr)
+    public async Task Get([FromQuery] int gnr, [FromQuery] int bnr, [FromQuery] int snr, [FromQuery] int startId)
     {
-        var response = Response;
-        response.Headers.Append("Content-Type", "text/event-stream");
+        Response.Headers.Append("Content-Type", "text/event-stream");
 
         _logger.LogInformation("Creating new route to processor");
         // Use this to send the data were it is supposed to go
@@ -35,13 +34,16 @@ public class SummaryController : ControllerBase
 
         try
         {
-            var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            using var streamingCall = client.SaySummary(new SummaryRequest { Gnr = gnr, Bnr = bnr, Snr = snr });
+            var timeoutToken = new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token;
+            var clientDisconnectToken = HttpContext.RequestAborted;
+            var linkTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutToken, clientDisconnectToken);
+            using var streamingCall = client.SaySummary(new SummaryRequest { Gnr = gnr, Bnr = bnr, Snr = snr, StartId = startId });
             await foreach (var reply in streamingCall.ResponseStream.ReadAllAsync(
-                               cancellationToken: cancellationToken.Token))
+                               cancellationToken: linkTokenSource.Token))
             {
                 Console.WriteLine("Reply received from processor: " + reply);
-                await response.WriteAsync($"data: {JsonSerializer.Serialize(reply)}\n\n");
+                await Response.WriteAsync($"data: {JsonSerializer.Serialize(reply)}\n\n");
+                Thread.Sleep(5000);
             }
 
             Console.WriteLine("Stream completed.");
@@ -51,6 +53,6 @@ public class SummaryController : ControllerBase
             Console.WriteLine("Stream cancelled.");
         }
         
-        await response.WriteAsync($"event: close\ndata: close\n\n");
+        await Response.WriteAsync($"event: close\ndata: close\n\n");
     }
 }
