@@ -30,7 +30,7 @@ public class DocumentController : ControllerBase
 
         using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
-            Response.ContentType = "application/octet-stream";
+            Response.ContentType = "application/pdf";
             Response.ContentLength = fileStream.Length;
             Response.StatusCode = 200;
             await fileStream.CopyToAsync(Response.Body);
