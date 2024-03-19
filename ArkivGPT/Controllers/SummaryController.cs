@@ -34,7 +34,7 @@ public class SummaryController : ControllerBase
 
         try
         {
-            var timeoutToken = new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token;
+            var timeoutToken = new CancellationTokenSource(TimeSpan.FromSeconds(120)).Token;
             var clientDisconnectToken = HttpContext.RequestAborted;
             var linkTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutToken, clientDisconnectToken);
             using var streamingCall = client.SaySummary(new SummaryRequest { Gnr = gnr, Bnr = bnr, Snr = snr, StartId = startId });
@@ -43,7 +43,6 @@ public class SummaryController : ControllerBase
             {
                 Console.WriteLine("Reply received from processor: " + reply);
                 await Response.WriteAsync($"data: {JsonSerializer.Serialize(reply)}\n\n");
-                Thread.Sleep(5000);
             }
 
             Console.WriteLine("Stream completed.");
