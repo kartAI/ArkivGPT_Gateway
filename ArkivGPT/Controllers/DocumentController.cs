@@ -18,7 +18,7 @@ public class DocumentController : ControllerBase
     [HttpGet]
     public async Task Get([FromQuery] string document)
     {
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", document);
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), document);
         _logger.LogInformation(filePath);
         
         if (!System.IO.File.Exists(filePath))
