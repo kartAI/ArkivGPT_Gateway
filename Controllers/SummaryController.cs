@@ -32,14 +32,14 @@ public class SummaryController : ControllerBase
         
         _logger.LogInformation("Getting reply from processor");
 
+        var timeoutToken = new CancellationTokenSource(TimeSpan.FromSeconds(120)).Token;
+        var clientDisconnectToken = HttpContext.RequestAborted;
+        var linkTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutToken, clientDisconnectToken);
+
         try
         {
-            var timeoutToken = new CancellationTokenSource(TimeSpan.FromSeconds(120)).Token;
-            var clientDisconnectToken = HttpContext.RequestAborted;
-            var linkTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeoutToken, clientDisconnectToken);
-            using var streamingCall = client.SaySummary(new SummaryRequest { Gnr = gnr, Bnr = bnr, Snr = snr, StartId = startId });
-            await foreach (var reply in streamingCall.ResponseStream.ReadAllAsync(
-                               cancellationToken: linkTokenSource.Token))
+            using var streamingCall = client.SaySummary(new SummaryRequest { Gnr = gnr, Bnr = bnr, Snr = snr, StartId = startId }, cancellationToken: linkTokenSource.Token);
+            await foreach (var reply in streamingCall.ResponseStream.ReadAllAsync(linkTokenSource.Token))
             {
                 Console.WriteLine("Reply received from processor: " + reply);
                 await Response.WriteAsync($"data: {JsonSerializer.Serialize(reply)}\n\n");

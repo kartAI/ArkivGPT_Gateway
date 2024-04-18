@@ -3,11 +3,10 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /gateway
 
 # Copy csproj and restore any dependencies (via NuGet)
-COPY ["ArkivGPT/ArkivGPT_Gateway.csproj", "ArkivGPT_Gateway/"]
-RUN dotnet restore "ArkivGPT_Gateway/ArkivGPT_Gateway.csproj"
+COPY . .
+RUN dotnet restore "ArkivGPT_Gateway.csproj"
 
 # Copy the project files and build our release
-COPY . .
 RUN dotnet publish -c Release -o out
 
 # Generate runtime image
